@@ -1,6 +1,6 @@
 # Emerson
 
-TODO: Write a gem description
+transcendent views. (WIP)
 
 ## Installation
 

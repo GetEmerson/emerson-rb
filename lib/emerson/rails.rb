@@ -1,7 +1,6 @@
 require 'rails'
+require 'emerson/rails/engine'
 
 module Emerson
-  module Rails
-    autoload :Engine, 'emerson/rails'
-  end
+  module Rails ; end
 end

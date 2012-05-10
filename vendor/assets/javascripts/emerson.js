@@ -5,9 +5,10 @@
 //     For all details and documentation:
 //     http://coolerator.net
 
-//= require emerson/base.js
-//= require emerson/util.js
-//= require emerson/http.js
-//= require emerson/sink.js
-//= require emerson/view.js
+//= require underscore
+//= require emerson/base
+//= require emerson/util
+//= require emerson/http
+//= require emerson/sink
+//= require emerson/view
 // @private

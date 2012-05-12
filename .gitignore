@@ -20,3 +20,4 @@ tmp
 .rspec
 .rvmrc
 .import/
+.sublime*

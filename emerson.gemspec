@@ -14,4 +14,6 @@ Gem::Specification.new do |gem|
   gem.name          = "emerson"
   gem.require_paths = ["lib"]
   gem.version       = Emerson::VERSION
+
+  gem.add_dependency "rails", "~> 3.2.0"
 end

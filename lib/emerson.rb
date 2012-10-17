@@ -2,5 +2,7 @@ require "emerson/version"
 require "emerson/rails"
 
 module Emerson
-  # Your code goes here...
+  autoload :Responder, 'emerson/responder'
+  autoload :Response,  'emerson/response'
+  autoload :Scope,     'emerson/scope'
 end

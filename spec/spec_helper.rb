@@ -18,6 +18,7 @@ end
 
 RSpec.configure do |config|
   config.include Capybara::RSpecMatchers
+  config.include Support::FeatureHelpers
   config.include Support::ResourceHelpers
 
   # ## Mock Framework

@@ -10,12 +10,52 @@ describe Emerson::Response, :type => :controller do
       expect(controller_class).to include(Emerson::Response)
     end
 
+    it "includes Emerson::Scope" do
+      expect(controller_class).to include(Emerson::Scope)
+    end
+
     it "configures the responder" do
       expect(controller_class.responder).to eq(Emerson::Responder)
     end
 
-    it "includes Emerson::Scope" do
-      expect(controller_class).to include(Emerson::Scope)
+    it "configures the :respond_to mimes" do
+      expect(controller_class.mimes_for_respond_to).to eq({ :html => {}, :json => {} })
+    end
+  end
+
+  context "when the :responder feature is disabled" do
+    let(:inline_controller) do
+      Class.new(ApplicationController) do
+        include Emerson::Response
+      end
+    end
+
+    around do |example|
+      with_features(nil) { example.run }
+    end
+
+    it "does not configure the responder" do
+      expect(inline_controller.responder).to eq(ActionController::Responder)
+    end
+
+    it "does not configure the :respond_to mimes" do
+      expect(inline_controller.mimes_for_respond_to).to eq({})
+    end
+  end
+
+  context "when the :scope feature is disabled" do
+    let(:inline_controller) do
+      Class.new(ApplicationController) do
+        include Emerson::Response
+      end
+    end
+
+    around do |example|
+      with_features(nil) { example.run }
+    end
+
+    it "does not include Emerson::Scope" do
+      expect(inline_controller).to_not include(Emerson::Scope)
     end
   end
 

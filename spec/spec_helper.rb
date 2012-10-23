@@ -20,6 +20,7 @@ RSpec.configure do |config|
   config.include Capybara::RSpecMatchers
   config.include Support::FeatureHelpers
   config.include Support::ResourceHelpers
+  config.include Support::TemplateHelpers
 
   # ## Mock Framework
   #
@@ -47,6 +48,14 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
+
+  config.before do
+    reset_resources
+  end
+
+  config.after do
+    reset_resources
+  end
 end
 
 Emerson.setup do |config|

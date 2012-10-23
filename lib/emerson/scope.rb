@@ -75,8 +75,6 @@ module Emerson
 
       def class_for(type)
         type.to_s.classify.constantize
-      rescue
-        nil
       end
 
       def default_scope

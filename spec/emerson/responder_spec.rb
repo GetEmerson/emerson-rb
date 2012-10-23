@@ -4,6 +4,8 @@ describe Emerson::Responder, :type => :controller do
   # We fake render, but don't want to blow up when RSpec tries to sweep later.
   render_views
 
+  let(:examples) { resources(:example, 2) }
+
   describe "GET #index" do
     before do
       # controller.setup do |c|
@@ -11,7 +13,7 @@ describe Emerson::Responder, :type => :controller do
       #   c.templates(:index => "<ul><% examples.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
       # end
 
-      @controller.stub(:resource).and_return(records(2))
+      controller.stub(:resource) { examples }
       stub_template('examples/index.html.erb' => "<ul><% examples.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
     end
 
@@ -28,8 +30,8 @@ describe Emerson::Responder, :type => :controller do
 
       it "responds with the expected locals" do
         get(:index)
-        expect(response.body).to have_css('ul > li', :text => records[0].name)
-        expect(response.body).to have_css('ul > li', :text => records[1].name)
+        expect(response.body).to have_css('ul > li', :text => examples[0].name)
+        expect(response.body).to have_css('ul > li', :text => examples[1].name)
       end
     end
 
@@ -41,7 +43,7 @@ describe Emerson::Responder, :type => :controller do
 
       it "responds with the expected JSON" do
         get(:index, :format => :json)
-        expect(response).to send_json(records)
+        expect(response).to send_json(examples)
       end
     end
 
@@ -60,9 +62,9 @@ describe Emerson::Responder, :type => :controller do
 
         expect(response).to send_json({
           :data => {
-            :examples => records
+            :examples => examples
           },
-          :view => "<ul><li>#{records[0].name}</li><li>#{records[1].name}</li></ul>"
+          :view => "<ul><li>#{examples[0].name}</li><li>#{examples[1].name}</li></ul>"
         })
       end
 
@@ -76,9 +78,9 @@ describe Emerson::Responder, :type => :controller do
 
           expect(response).to send_json({
             :data => {
-              :examples => records
+              :examples => examples
             },
-            :view => records.map(&:name).to_json
+            :view => examples.map(&:name).to_json
           })
         end
       end
@@ -86,7 +88,7 @@ describe Emerson::Responder, :type => :controller do
       context "when the target template is missing" do
         it "fails over to the default behavior" do
           get(:index, :format => :json, :path => 'bogus')
-          expect(response).to send_json(records)
+          expect(response).to send_json(examples)
         end
       end
     end
@@ -106,7 +108,7 @@ describe Emerson::Responder, :type => :controller do
 
         expect(response).to send_json({
           :data => {
-            :examples => records
+            :examples => examples
           }
         })
       end
@@ -126,7 +128,7 @@ describe Emerson::Responder, :type => :controller do
         get(:index, :format => :json)
 
         expect(response).to send_json({
-          :view => "<ul><li>#{records[0].name}</li><li>#{records[1].name}</li></ul>"
+          :view => "<ul><li>#{examples[0].name}</li><li>#{examples[1].name}</li></ul>"
         })
       end
 
@@ -139,7 +141,7 @@ describe Emerson::Responder, :type => :controller do
           get(:index, :format => :json)
 
           expect(response).to send_json({
-            :view => records.map(&:name).to_json
+            :view => examples.map(&:name).to_json
           })
         end
       end
@@ -173,9 +175,5 @@ describe Emerson::Responder, :type => :controller do
 
         super(action, params)
       end
-    end
-
-    def stub_template(hash)
-      @controller.view_paths.unshift(ActionView::FixtureResolver.new(hash))
     end
 end

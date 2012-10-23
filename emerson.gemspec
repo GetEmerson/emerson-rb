@@ -1,19 +1,28 @@
-# -*- encoding: utf-8 -*-
-require File.expand_path('../lib/emerson/version', __FILE__)
+$:.push File.expand_path("../lib", __FILE__)
 
-Gem::Specification.new do |gem|
-  gem.authors       = ["Corey Innis"]
-  gem.email         = ["corey@coolerator.net"]
-  gem.description   = %q{transcendent views}
-  gem.summary       = %q{emerson believes in the inherent good in...}
-  gem.homepage      = "https://github.com/coreyti/emerson"
+require "emerson/version"
 
-  gem.files         = `git ls-files`.split($\)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.name          = "emerson"
-  gem.require_paths = ["lib"]
-  gem.version       = Emerson::VERSION
+Gem::Specification.new do |s|
+  s.name          = "emerson"
+  s.version       = Emerson::VERSION
+  s.authors       = ["Corey Innis"]
+  s.email         = ["corey@coolerator.net"]
+  s.homepage      = "https://github.com/coreyti/emerson"
+  s.summary       = %q{transcendent views}
+  s.description   = %q{emerson believes in the inherent good in...}
 
-  gem.add_dependency "rails", "~> 3.2.0"
+  s.files         = `git ls-files`.split($\)
+  s.executables   = s.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  s.test_files    = s.files.grep(%r{^(test|spec|features)/})
+
+  s.add_dependency "rails", "~> 3.2.0"
+  s.add_dependency "jquery-rails" # for now.
+
+  s.add_development_dependency "capybara"
+  s.add_development_dependency "coffee-script"
+  s.add_development_dependency "jasmine"
+  s.add_development_dependency "jasminerice"
+  s.add_development_dependency "jasminerice-runner"
+  s.add_development_dependency "rspec-rails"
+  s.add_development_dependency "sqlite3"
 end

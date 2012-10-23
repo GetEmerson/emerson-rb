@@ -5,7 +5,9 @@
 /.rvmrc
 /.rspec
 /.sublime*
+/.yardoc
 
+/doc/*
 /log/*.log
 /pkg/*
 /tmp/*

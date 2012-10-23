@@ -14,7 +14,7 @@ PATH
       rails (~> 3.2.0)
 
 GEM
-  remote: https://rubygems.org/
+  remote: http://rubygems.org/
   specs:
     actionmailer (3.2.8)
       actionpack (= 3.2.8)
@@ -151,6 +151,9 @@ GEM
     tzinfo (0.3.33)
     xpath (0.1.4)
       nokogiri (~> 1.3)
+    yard (0.8.3)
+    yard-rails (0.3.0)
+      yard
 
 PLATFORMS
   ruby
@@ -166,3 +169,5 @@ DEPENDENCIES
   jquery-rails
   rspec-rails
   sqlite3
+  yard
+  yard-rails

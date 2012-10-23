@@ -1,6 +1,6 @@
-module Emerson # :nodoc:
+module Emerson
   module Matchers
-    module ActionController # :nodoc:
+    module ActionController
       # Example:
       #
       #   expect(response).to send_json({ :key => 'value' })
@@ -28,7 +28,7 @@ module Emerson # :nodoc:
         SendJsonMatcher.new(expected, self)
       end
 
-      class SendJsonMatcher # :nodoc:
+      class SendJsonMatcher
         attr_reader :expected, :actual, :mode
 
         def initialize(expected, context)

@@ -1,0 +1,1 @@
+--markup markdown --protected --plugin yard-rails lib/**/*.rb - README.md LICENSE

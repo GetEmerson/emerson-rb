@@ -1,5 +1,3 @@
-# :enddoc:
-
 if defined?(ActionController)
   require 'emerson/matchers/action_controller'
 

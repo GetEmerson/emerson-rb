@@ -11,6 +11,11 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
   end
 
   context "provided a Hash representing the expected JSON" do
+    it "provides a helpful description" do
+      matcher = send_json({})
+      expect(matcher.description).to eq('send JSON: (provided)')
+    end
+
     it "accepts exact matches" do
       expect(response).to send_json(resource)
     end
@@ -24,15 +29,34 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
       expect(response).to_not send_json({ :one => 2, :two => 1 })
       expect(response).to_not send_json(resource.to_json)
     end
+  end
+
+  context "provided an Array representing the expected JSON" do
+    let(:resource) { [:one, :two] }
 
     it "provides a helpful description" do
-      matcher = send_json({ :one => '01', :two => '02' })
+      matcher = send_json([])
       expect(matcher.description).to eq('send JSON: (provided)')
+    end
+
+    it "accepts exact matches" do
+      expect(response).to send_json(resource)
+    end
+
+    it "rejects invalid matches" do
+      expect(response).to_not send_json({})
+      expect(response).to_not send_json([])
+      expect(response).to_not send_json([:two, :one])
     end
   end
 
   context "provided a String representing a JSON fixture lookup" do
     let(:name) { 'example/simple' }
+
+    it "provides a helpful description" do
+      matcher = send_json(name)
+      expect(matcher.description).to eq('send JSON: example/simple.json')
+    end
 
     it "accepts valid matches" do
       expect(response).to send_json(name)
@@ -41,11 +65,6 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
 
     it "rejects invalid matches" do
       expect(response).to_not send_json('example/bogus')
-    end
-
-    it "provides a helpful description" do
-      matcher = send_json(name)
-      expect(matcher.description).to eq('send JSON: example/simple.json')
     end
   end
 

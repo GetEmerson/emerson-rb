@@ -81,7 +81,7 @@ module Emerson # :nodoc:
                 @mode_description = filename(source)
                 path = fixture(source)
                 File.exist?(path) ? JSON.parse(File.read(path)) : { :missing => path.to_s }
-              when Hash
+              when Array, Hash
                 @mode_description = '(provided)'
                 JSON.parse(source.to_json)
               else
@@ -89,7 +89,7 @@ module Emerson # :nodoc:
               end
             end
 
-            if result.keys.include?('$extends')
+            if result.is_a?(Hash) && result.keys.include?('$extends')
               refs = [result.delete('$extends')].flatten
 
               result = {}.tap do |hash|

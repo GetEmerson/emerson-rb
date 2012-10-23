@@ -2,24 +2,12 @@ require 'action_controller/base'
 
 module Emerson
   class Responder < ActionController::Responder
-    # class << self
-    #   def base_decorator=(value)
-    #     @@base_decorator = value
-    #   end
-    # 
-    #   def base_decorator
-    #     # NOTE: requires definition of BaseDecorator
-    #     @@base_decorator ||= BaseDecorator
-    #   end
-    # end
-
     delegate :render_to_string, :to => :controller
 
     def initialize(*)
       super
       # NOTE: don't love the @resource ivar...
-      # may be able to remove in favor of layouts
-      controller.instance_variable_set(:"@resource", decorate(resource))
+      controller.instance_variable_set(:"@resource", resource)
     end
 
     def to_html
@@ -30,48 +18,67 @@ module Emerson
     end
 
     def to_json
-      # JSON rendering:
-      # 1. try xxx.json.erb
-      # 2. fail over to xxx.html.erb
-      controller.formats = [:json, :html]
+      if (mode = vendor_mode)
+        controller.formats = [:json, :html]
 
-      render({
-        :json => {
-          :data => locals,
-          :view => render_to_string(render_args(:layout => false)).gsub(/\n/, '').presence,
-        }
-        # TODO: consider adding (with proper logic)...
-        # :location => location,
-        # :status   => status
-      })
+        json = {}.tap do |hash|
+          unless_mode(:view) { hash[:data] = locals }
+          unless_mode(:data) do
+            hash[:view] = render_to_string(render_args(:layout => false)).gsub(/\n/, '').presence
+          end
+        end
+
+        render(:json => json)
+      else
+        to_format
+      end
     rescue ActionView::MissingTemplate
       debug(:missing_template)
+
+      controller.formats = [:json]
       to_format
     end
 
     private
 
+      def unless_mode(mode)
+        (vendor_mode == mode) ? nil : yield
+      end
+
+      # TODO: Emerson.vendor_pattern =
+      #       "application/vnd.emerson[.{version}][.(full|data|view)]+json"
+      def vendor_pattern
+        /application\/vnd\.emerson(\.([a-z]+))?\+json/
+      end
+
+      def vendor_mode
+        @_vendor_mode ||= begin
+          result = false
+
+          if (header = request.env['HTTP_ACCEPT'])
+            if (match = header.match(vendor_pattern))
+              result = (match[2] || 'full').intern
+            end
+          end
+
+          result
+        end
+      end
+
       def action
         @_action ||= (@action || controller.action_name).intern
       end
 
-      def decorated_resources
-        # NOTE: would like to use controller.current_scope, but i claimed that for the symbol
-        scope   = controller.instance_variable_get(:"@scope")
-        results = ([scope] + resources).compact
-        decorate(results)
-      end
-
+      # TODO: rename for accuracy
       def locals
         @_locals ||= begin
-          base = (options[:locals] || {})
-          base.each do |k, v|
-            base[k] = decorate(v)
-          end
+          scope   = controller.instance_variable_get(:"@scope")
+          results = ([scope] + resources).compact
 
-          decorated_resources.inject(base) do |memo, object|
-            memo[key_for(object)] = object
-            memo
+          (options[:locals] || {}).tap do |hash|
+            results.each do |object|
+              hash[key_for(object)] = object
+            end
           end
         end
       end
@@ -126,11 +133,6 @@ module Emerson
         else
           :show
         end
-      end
-
-      def decorate(object)
-        # ActiveDecorator::Decorator.instance.decorate(object)
-        object
       end
 
       def key_for(object)

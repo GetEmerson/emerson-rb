@@ -66,6 +66,7 @@ GEM
     erubis (2.7.0)
     execjs (1.4.0)
       multi_json (~> 1.0)
+    ffaker (1.15.0)
     ffi (1.1.5)
     haml (3.1.7)
     hike (1.2.1)
@@ -158,6 +159,7 @@ DEPENDENCIES
   capybara
   coffee-script
   emerson!
+  ffaker
   jasmine
   jasminerice!
   jasminerice-runner

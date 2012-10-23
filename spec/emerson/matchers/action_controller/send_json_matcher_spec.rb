@@ -80,7 +80,7 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
 
   private
 
-    controller do
+    controller(ApplicationController) do
       respond_to :json
 
       def self.name

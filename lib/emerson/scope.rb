@@ -1,6 +1,7 @@
 require 'action_controller/base'
 
 module Emerson
+  # Add helpers for request-base, scoped resource loading.
   module Scope
     def self.included(base)
       base.class_eval do
@@ -53,11 +54,7 @@ module Emerson
     end
 
     def current_scope
-      @_current_scope ||= begin
-        if @scope.present?
-          @scope.class.model_name.plural.intern
-        end
-      end
+      scoped && @scope
     end
 
     protected

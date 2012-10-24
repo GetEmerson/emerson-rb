@@ -2,6 +2,7 @@ require "spec_helper"
 
 describe Emerson::Scope, :type => :controller do
   render_views
+  let!(:products) { resources(:product, 2) }
 
   describe ".scope" do
     context "called without a 'resources' argument" do
@@ -18,19 +19,46 @@ describe Emerson::Scope, :type => :controller do
       it "raises an exception" do
         expect {
           controller_class.class_eval do
-            scope :examples
+            scope :products
           end
         }.to raise_error(ArgumentError)
       end
     end
   end
 
-  describe "#scoped" do
-    let!(:examples) { resources(:example, 2) }
+  describe "#current_scope" do
+    let(:user) { resource(:user) }
 
     before do
-      controller.stub(:resource) { examples }
-      stub_template('examples/index.html.erb' => "<ul><% examples.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
+      user.products = [products.first]
+
+      controller do
+        scope :products, :by => :user
+
+        def index
+          render(:json => { :user => current_scope.id })
+        end
+      end
+    end
+
+    it "returns the record representing the current scope" do
+      get(:index, :user_id => user.id)
+      expect(response).to send_json({
+        :user => user.id
+      })
+    end
+
+    context "detailed scope configurations and environments" do
+      it "is pending" do
+        pending "TODO"
+      end
+    end
+  end
+
+  describe "#scoped" do
+    before do
+      controller.stub(:resource) { products }
+      stub_template('products/index.html.erb' => "<ul><% products.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
     end
   
     context "without a scope configuration" do
@@ -44,8 +72,8 @@ describe Emerson::Scope, :type => :controller do
   
       it "selects the resource using the default scope, from the controller name" do
         get(:index)
-        expect(response.body).to have_css('ul > li', :text => examples[0].name)
-        expect(response.body).to have_css('ul > li', :text => examples[1].name)
+        expect(response.body).to have_css('ul > li', :text => products[0].name)
+        expect(response.body).to have_css('ul > li', :text => products[1].name)
       end
     end
   
@@ -53,10 +81,10 @@ describe Emerson::Scope, :type => :controller do
       let(:user) { resource(:user) }
 
       before do
-        user.examples = [examples.first]
+        user.products = [products.first]
 
         controller do
-          scope :examples, :by => :user
+          scope :products, :by => :user
 
           def index
             respond_with(scoped)
@@ -67,16 +95,16 @@ describe Emerson::Scope, :type => :controller do
       context "given no scoping environment" do
         it "selects the resource using the default scope, from configuration" do
           get(:index)
-          expect(response.body).to have_css('ul > li', :text => examples[0].name)
-          expect(response.body).to have_css('ul > li', :text => examples[1].name)
+          expect(response.body).to have_css('ul > li', :text => products[0].name)
+          expect(response.body).to have_css('ul > li', :text => products[1].name)
         end
       end
 
       context "given a scoping environment based on request params" do
         it "selects the resource using the provided scope" do
           get(:index, :user_id => user.id)
-          expect(response.body).to     have_css('ul > li', :text => examples[0].name)
-          expect(response.body).to_not have_css('ul > li', :text => examples[1].name)
+          expect(response.body).to     have_css('ul > li', :text => products[0].name)
+          expect(response.body).to_not have_css('ul > li', :text => products[1].name)
         end
       end
     end
@@ -85,11 +113,11 @@ describe Emerson::Scope, :type => :controller do
       let(:user) { resource(:user) }
 
       before do
-        user.examples = [examples.first]
+        user.products = [products.first]
 
         controller.stub(:user) { user }
         controller do
-          scope :examples, :by => :user
+          scope :products, :by => :user
 
           def index
             respond_with(scoped(user))
@@ -99,8 +127,8 @@ describe Emerson::Scope, :type => :controller do
 
       it "selects the resource using the provided scope" do
         get(:index)
-        expect(response.body).to     have_css('ul > li', :text => examples[0].name)
-        expect(response.body).to_not have_css('ul > li', :text => examples[1].name)
+        expect(response.body).to     have_css('ul > li', :text => products[0].name)
+        expect(response.body).to_not have_css('ul > li', :text => products[1].name)
       end
     end
   end
@@ -111,7 +139,7 @@ describe Emerson::Scope, :type => :controller do
       include Emerson::Response
 
       def self.name
-        'ExamplesController'
+        'ProductsController'
       end
 
       private
@@ -139,8 +167,8 @@ describe Emerson::Scope, :type => :controller do
     def get(action, params = {})
       with_routing do |map|
         map.draw do
-          match 'examples'     => 'examples#index'
-          match 'examples/:id' => 'examples#show'
+          match 'products'     => 'products#index'
+          match 'products/:id' => 'products#show'
         end
 
         super(action, params)

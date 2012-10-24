@@ -65,7 +65,7 @@ describe Emerson::Response, :type => :controller do
       include Emerson::Response
 
       def self.name
-        'ExamplesController'
+        'ProductsController'
       end
     end
 

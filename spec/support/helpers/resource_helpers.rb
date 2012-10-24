@@ -3,7 +3,7 @@ require 'virtus'
 module Support
   module ResourceHelpers
     def reset_resources
-      Example.records = []
+      Product.records = []
       User.records    = []
     end
 
@@ -27,23 +27,21 @@ module Support
 
     def resource_class(type)
       case type
-      when :example
-        Example
+      when :product
+        Product
       when :user
         User
       end
     end
 
-    class Example
+    class Base
       include Virtus
       extend  ActiveModel::Naming
       include ActiveModel::Conversion
       include ActiveModel::Validations
 
-      attribute :id,
-        Fixnum, :default => lambda { |inst, attr| inst.class.records.length + 1 }
-      attribute :name,
-        String, :default => lambda { |inst, attr| Faker::Name.name }
+      attribute :id,   Fixnum, :default => :default_id
+      attribute :name, String, :default => :default_name
 
       class_attribute :records
       self.records = []
@@ -65,13 +63,33 @@ module Support
           self.records
         end
       end
+
+      def default_id
+        Faker::Lorem.word
+      end
+
+      def default_name
+        Faker::Lorem.word
+      end
     end
 
-    class User < Example
-      attribute :examples,
-        Array, :default => lambda { |inst, attr| [Example.new, Example.new] }
+    class Product < Base
+      def default_name
+        Faker::Product.product_name
+      end
+    end
 
-      self.records = []
+    class User < Base
+      attribute :products, Array, :default => :default_products
+
+      # self.records = []
+      def default_name
+        Faker::Name.name.gsub(/[']/, '')
+      end
+
+      def default_products
+        [Product.new, Product.new]
+      end
     end
   end
 end

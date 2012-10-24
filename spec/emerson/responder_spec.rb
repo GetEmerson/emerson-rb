@@ -4,17 +4,17 @@ describe Emerson::Responder, :type => :controller do
   # We fake render, but don't want to blow up when RSpec tries to sweep later.
   render_views
 
-  let(:examples) { resources(:example, 2) }
+  let(:products) { resources(:product, 2) }
 
   describe "GET #index" do
     before do
       # controller.setup do |c|
       #   c.resources(:index => resources(5))
-      #   c.templates(:index => "<ul><% examples.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
+      #   c.templates(:index => "<ul><% products.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
       # end
 
-      controller.stub(:resource) { examples }
-      stub_template('examples/index.html.erb' => "<ul><% examples.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
+      controller.stub(:resource) { products }
+      stub_template('products/index.html.erb' => "<ul><% products.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
     end
 
     context "as HTML" do
@@ -30,8 +30,8 @@ describe Emerson::Responder, :type => :controller do
 
       it "responds with the expected locals" do
         get(:index)
-        expect(response.body).to have_css('ul > li', :text => examples[0].name)
-        expect(response.body).to have_css('ul > li', :text => examples[1].name)
+        expect(response.body).to have_css('ul > li', :text => products[0].name)
+        expect(response.body).to have_css('ul > li', :text => products[1].name)
       end
     end
 
@@ -43,7 +43,7 @@ describe Emerson::Responder, :type => :controller do
 
       it "responds with the expected JSON" do
         get(:index, :format => :json)
-        expect(response).to send_json(examples)
+        expect(response).to send_json(products)
       end
     end
 
@@ -62,15 +62,15 @@ describe Emerson::Responder, :type => :controller do
 
         expect(response).to send_json({
           :data => {
-            :examples => examples
+            :products => products
           },
-          :view => "<ul><li>#{examples[0].name}</li><li>#{examples[1].name}</li></ul>"
+          :view => "<ul><li>#{products[0].name}</li><li>#{products[1].name}</li></ul>"
         })
       end
 
       context "when a custom `.json` template is found" do
         before do
-          stub_template('examples/index.json.erb' => "<%= examples.map(&:name).to_json.html_safe %>")
+          stub_template('products/index.json.erb' => "<%= products.map(&:name).to_json.html_safe %>")
         end
 
         it "responds using the template for the :view" do
@@ -78,9 +78,9 @@ describe Emerson::Responder, :type => :controller do
 
           expect(response).to send_json({
             :data => {
-              :examples => examples
+              :products => products
             },
-            :view => examples.map(&:name).to_json
+            :view => products.map(&:name).to_json
           })
         end
       end
@@ -88,7 +88,7 @@ describe Emerson::Responder, :type => :controller do
       context "when the target template is missing" do
         it "fails over to the default behavior" do
           get(:index, :format => :json, :path => 'bogus')
-          expect(response).to send_json(examples)
+          expect(response).to send_json(products)
         end
       end
     end
@@ -108,7 +108,7 @@ describe Emerson::Responder, :type => :controller do
 
         expect(response).to send_json({
           :data => {
-            :examples => examples
+            :products => products
           }
         })
       end
@@ -128,20 +128,20 @@ describe Emerson::Responder, :type => :controller do
         get(:index, :format => :json)
 
         expect(response).to send_json({
-          :view => "<ul><li>#{examples[0].name}</li><li>#{examples[1].name}</li></ul>"
+          :view => "<ul><li>#{products[0].name}</li><li>#{products[1].name}</li></ul>"
         })
       end
 
       context "when a custom `.json` template is found" do
         before do
-          stub_template('examples/index.json.erb' => "<%= examples.map(&:name).to_json.html_safe %>")
+          stub_template('products/index.json.erb' => "<%= products.map(&:name).to_json.html_safe %>")
         end
 
         it "responds using the template for the :view" do
           get(:index, :format => :json)
 
           expect(response).to send_json({
-            :view => examples.map(&:name).to_json
+            :view => products.map(&:name).to_json
           })
         end
       end
@@ -154,7 +154,7 @@ describe Emerson::Responder, :type => :controller do
       include Emerson::Response
 
       def self.name
-        'ExamplesController'
+        'ProductsController'
       end
 
       def index
@@ -169,8 +169,8 @@ describe Emerson::Responder, :type => :controller do
     def get(action, params = {})
       with_routing do |map|
         map.draw do
-          match 'examples'     => 'examples#index'
-          match 'examples/:id' => 'examples#show'
+          match 'products'     => 'products#index'
+          match 'products/:id' => 'products#show'
         end
 
         super(action, params)

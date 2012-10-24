@@ -1,6 +1,7 @@
 require 'action_controller/base'
 
 module Emerson
+  # Add conventions for resourceful rendering and responses.
   class Responder < ActionController::Responder
     delegate :render_to_string, :to => :controller
 

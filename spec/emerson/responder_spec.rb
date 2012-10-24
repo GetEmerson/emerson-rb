@@ -1,20 +1,30 @@
 require "spec_helper"
 
 describe Emerson::Responder, :type => :controller do
-  # We fake render, but don't want to blow up when RSpec tries to sweep later.
   render_views
-
-  let(:products) { resources(:product, 2) }
+  let!(:products) { resources(:product, 2) }
 
   describe "GET #index" do
-    before do
-      # controller.setup do |c|
-      #   c.resources(:index => resources(5))
-      #   c.templates(:index => "<ul><% products.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
-      # end
+    controller(:products)
 
-      controller.stub(:resource) { products }
-      stub_template('products/index.html.erb' => "<ul><% products.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
+    before do
+      controller do
+        def index
+          respond_with(products)
+        end
+      end
+
+      templates do
+        def index
+          <<-ERB
+          <ul>
+            <% products.each do |product| %>
+            <li><%= product.name %></li>
+            <% end %>
+          </ul>
+          ERB
+        end
+      end
     end
 
     context "as HTML" do
@@ -86,8 +96,16 @@ describe Emerson::Responder, :type => :controller do
       end
 
       context "when the target template is missing" do
+        before do
+          controller do
+            def index
+              respond_with(products, :path => 'bogus/path')
+            end
+          end
+        end
+
         it "fails over to the default behavior" do
-          get(:index, :format => :json, :path => 'bogus')
+          get(:index, :format => :json)
           expect(response).to send_json(products)
         end
       end
@@ -146,34 +164,54 @@ describe Emerson::Responder, :type => :controller do
         end
       end
     end
-  end
 
-  private
+    context "with Scope" do
+      let(:user) { resource(:user) }
 
-    controller(ApplicationController) do
-      include Emerson::Response
-
-      def self.name
-        'ProductsController'
+      before do
+        user.products = [products.first]
       end
 
-      def index
-        respond_with(resource, :path => params[:path])
-      end
-    end
+      context "when :path is customized as :scoped" do
+        before do
+          template('users/products/index.html.erb' => '<p>custom template</p>')
 
-    def controller_class
-      described_class
-    end
+          controller do
+            scope :products, :by => :user
 
-    def get(action, params = {})
-      with_routing do |map|
-        map.draw do
-          match 'products'     => 'products#index'
-          match 'products/:id' => 'products#show'
+            def index
+              respond_with(scoped, :path => :scoped)
+            end
+          end
         end
 
-        super(action, params)
+        it "responds with the expected template" do
+          get(:index, :user_id => user.id)
+          expect(response.body).to have_css('p', :text => 'custom template')
+        end
+      end
+
+      context "when :layout is customized as :scoped" do
+        before do
+          template({
+            'users.html.erb' => '<p>custom layout</p>',
+            :layout => true
+          })
+
+          controller do
+            scope :products, :by => :user
+
+            def index
+              respond_with(scoped, :layout => :scoped)
+            end
+          end
+        end
+
+        it "responds with the expected layout" do
+          get(:index, :user_id => user.id)
+          expect(response.body).to have_css('p', :text => 'custom layout')
+        end
       end
     end
+  end
 end

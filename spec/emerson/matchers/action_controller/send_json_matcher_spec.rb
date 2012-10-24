@@ -1,13 +1,22 @@
 require "spec_helper"
 
 describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :controller do
-  let(:do_request) { get :show, :id => 1, :format => :json }
-  let(:resource)   { { :one => 1, :two => 2 } }
+  let(:do_request) { get :index, :format => :json }
+  let!(:products)  { { :one => 1, :two => 2 } }
+
+  controller(:products)
 
   before do
-    @controller.stub(:resource).and_return(resource)
+    controller do
+      respond_to :json
+
+      def index
+        respond_with(products)
+      end
+    end
+
     do_request
-    expect(response.body).to eq(resource.to_json)
+    expect(response.body).to eq(products.to_json)
   end
 
   context "provided a Hash representing the expected JSON" do
@@ -17,7 +26,7 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
     end
 
     it "accepts exact matches" do
-      expect(response).to send_json(resource)
+      expect(response).to send_json(products)
     end
 
     it "accepts valid matches with re-ordered pairs" do
@@ -27,12 +36,12 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
     it "rejects invalid matches" do
       expect(response).to_not send_json({})
       expect(response).to_not send_json({ :one => 2, :two => 1 })
-      expect(response).to_not send_json(resource.to_json)
+      expect(response).to_not send_json(products.to_json)
     end
   end
 
   context "provided an Array representing the expected JSON" do
-    let(:resource) { [:one, :two] }
+    let(:products) { [:one, :two] }
 
     it "provides a helpful description" do
       matcher = send_json([])
@@ -40,7 +49,7 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
     end
 
     it "accepts exact matches" do
-      expect(response).to send_json(resource)
+      expect(response).to send_json(products)
     end
 
     it "rejects invalid matches" do
@@ -51,11 +60,11 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
   end
 
   context "provided a String representing a JSON fixture lookup" do
-    let(:name) { 'example/simple' }
+    let(:name) { 'products/simple' }
 
     it "provides a helpful description" do
       matcher = send_json(name)
-      expect(matcher.description).to eq('send JSON: example/simple.json')
+      expect(matcher.description).to eq('send JSON: products/simple.json')
     end
 
     it "accepts valid matches" do
@@ -64,7 +73,7 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
     end
 
     it "rejects invalid matches" do
-      expect(response).to_not send_json('example/bogus')
+      expect(response).to_not send_json('products/bogus')
     end
   end
 
@@ -75,15 +84,15 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
   end
 
   context "given JSON with the `$extends` keyword" do
-    let(:resource) { { :one => 1, :two => 2, :addition => 'more' } }
+    let(:products) { { :one => 1, :two => 2, :addition => 'more' } }
 
     it "accepts valid matches" do
-      expect(response).to send_json('example/extend-success')
-      expect(response).to send_json('example/extend-array')
+      expect(response).to send_json('products/extend-success')
+      expect(response).to send_json('products/extend-array')
     end
 
     it "rejects valid matches" do
-      expect(response).to_not send_json('example/extend-failure')
+      expect(response).to_not send_json('products/extend-failure')
     end
   end
 
@@ -98,28 +107,6 @@ describe Emerson::Matchers::ActionController::SendJsonMatcher, :type => :control
   end
 
   private
-
-    controller(ApplicationController) do
-      respond_to :json
-
-      def self.name
-        'ExamplesController'
-      end
-
-      def show
-        respond_with(resource)
-      end
-    end
-
-    def get(action, params = {})
-      with_routing do |map|
-        map.draw do
-          match 'examples/:id' => 'examples#show'
-        end
-
-        super(action, params)
-      end
-    end
 
     def failure_message
       <<-EOMSG

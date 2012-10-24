@@ -1,0 +1,4 @@
+{
+  "$extends" : "products/simple.json",
+  "addition" : "more"
+}

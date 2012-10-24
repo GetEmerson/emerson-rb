@@ -1,1 +1,0 @@
-{ "$extends" : ["example/simple.json", "example/extend-success.json"] }

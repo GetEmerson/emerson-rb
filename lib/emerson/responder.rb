@@ -87,9 +87,10 @@ module Emerson
       def render_args(overrides = {})
         # TODO: spec me!
         @_render_args ||= begin
-          if options[:layout] == :scoped
+          # TODO: move to conditionally-imported module
+          if options[:layout].to_s == 'scoped'
             options.delete(:layout)
-            options[:layout] = controller.current_scope.to_s if controller.current_scope.present?
+            options[:layout] = scope_type.to_s if controller.current_scope.present?
           end
 
           options.merge({
@@ -104,9 +105,9 @@ module Emerson
           if options[:location].present?
             nil
           elsif (path = options[:path])
-            # TODO: spec me!
-            if path == :scoped
-              options[:path] = template_built(controller.current_scope)
+            # TODO: move to conditionally-imported module
+            if path.to_s == 'scoped'
+              options[:path] = template_built(scope_type)
             end
 
             options[:path]
@@ -157,6 +158,11 @@ module Emerson
       def key_for_related(object)
         # for now, assume :model_name
         object.class.model_name.element.intern
+      end
+
+      # TODO: move to conditionally-imported module
+      def scope_type
+        controller.current_scope.class.name.pluralize.underscore.intern
       end
 
       def debug(type)

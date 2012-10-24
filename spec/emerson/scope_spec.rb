@@ -4,6 +4,22 @@ describe Emerson::Scope, :type => :controller do
   render_views
   let!(:products) { resources(:product, 2) }
 
+  controller(:products)
+
+  before do
+    templates do
+      def index
+        <<-ERB
+        <ul>
+          <% products.each do |product| %>
+          <li><%= product.name %></li>
+          <% end %>
+        </ul>
+        ERB
+      end
+    end
+  end
+
   describe ".scope" do
     context "called without a 'resources' argument" do
       it "raises an exception" do
@@ -56,11 +72,6 @@ describe Emerson::Scope, :type => :controller do
   end
 
   describe "#scoped" do
-    before do
-      controller.stub(:resource) { products }
-      stub_template('products/index.html.erb' => "<ul><% products.each do |ex| %><li><%= ex.name %></li><% end %></ul>")
-    end
-  
     context "without a scope configuration" do
       before do
         controller do
@@ -132,46 +143,4 @@ describe Emerson::Scope, :type => :controller do
       end
     end
   end
-
-  private
-
-    controller(ApplicationController) do
-      include Emerson::Response
-
-      def self.name
-        'ProductsController'
-      end
-
-      private
-
-        # Would typically be derived from the controller name. However,
-        # we do not have and `Example` class.
-        def class_for(type)
-          "Support::ResourceHelpers::#{type.to_s.camelcase}".constantize
-        end
-    end
-
-    # Helper for augmenting the controller class for a given example.
-    def controller(&body)
-      if block_given?
-        controller_class.class_eval(&body)
-      end
-
-      super
-    end
-
-    def controller_class
-      described_class
-    end
-
-    def get(action, params = {})
-      with_routing do |map|
-        map.draw do
-          match 'products'     => 'products#index'
-          match 'products/:id' => 'products#show'
-        end
-
-        super(action, params)
-      end
-    end
 end

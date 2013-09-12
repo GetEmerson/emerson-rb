@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.executables   = s.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
 
-  s.add_dependency "rails", "~> 3.2.0"
+  s.add_dependency "rails", ">= 3.2.0"
   s.add_dependency "jquery-rails" # for now.
 
   s.add_development_dependency "capybara"

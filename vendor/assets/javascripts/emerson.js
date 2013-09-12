@@ -5,6 +5,7 @@
 //     For all details and documentation:
 //     http://coolerator.net
 
+//     = require underscore.js
 //     = require emerson/base.js
 //     = require emerson/util.js
 //     = require emerson/http.js

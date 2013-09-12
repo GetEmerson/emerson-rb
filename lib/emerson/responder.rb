@@ -25,7 +25,8 @@ module Emerson
         json = {}.tap do |hash|
           unless_mode(:view) { hash[:data] = locals }
           unless_mode(:data) do
-            hash[:view] = render_to_string(render_args(:layout => false)).gsub(/\n/, '').presence
+            hash[:view] = render_to_string(render_args(:layout => false))
+              .gsub(/\n/, '').presence
           end
         end
 
@@ -54,7 +55,7 @@ module Emerson
 
       def vendor_mode
         @_vendor_mode ||= begin
-          result = false
+          result = (Emerson.response_config[:json_default] || :full).intern
 
           if (header = request.env['HTTP_ACCEPT'])
             if (match = header.match(vendor_pattern))

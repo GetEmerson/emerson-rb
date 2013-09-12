@@ -27,6 +27,11 @@ module Emerson
   mattr_accessor :fixture_path
   @@fixture_path = nil
 
+  mattr_accessor :response_config
+  @@response_config = {
+    :json_default => 'full'
+  }
+
   # Default way to setup Emerson. For Rails, call from an initializer.
   #
   # @example in 'config/initializers/emerson.rb'

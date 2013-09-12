@@ -53,7 +53,12 @@ describe Emerson::Responder, :type => :controller do
 
       it "responds with the expected JSON" do
         get(:index, :format => :json)
-        expect(response).to send_json(products)
+        expect(response).to send_json({
+          :data => {
+            :products => products
+          },
+          :view => "<ul><li>#{products[0].name}</li><li>#{products[1].name}</li></ul>"
+        })
       end
     end
 

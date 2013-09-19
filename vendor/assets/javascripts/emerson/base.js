@@ -87,6 +87,30 @@
   };
 
 
+  // jQuery Extension
+  // --------------------------------------------------------------------------
+
+  // ### $.fn.emerson
+  //
+  //     $(document).emerson()
+  //
+  // Enables/inits Emerson on page load.  Also handles `page:load` events, as
+  // fired by the Rails jquery-ujs package.
+  //
+  $.fn.emerson = function emerson() {
+    _.each(this, function(e) {
+      $(document).ready(function() {
+        Emerson.init();
+      });
+
+      $(document).on('page:load', function() {
+        Emerson.init();
+      });
+    });
+
+    return this;
+  };
+
   // Underscore Extension
   // --------------------------------------------------------------------------
 

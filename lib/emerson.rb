@@ -39,10 +39,11 @@ module Emerson
   #     config.fixture_path = Rails.root.join('custom/path')
   #   end
   def self.setup
-    # environmental defaults:
-    if defined?(RSpec)
-      self.fixture_path ||= RSpec.configuration.fixture_path
-    end
+    # # environmental defaults:
+    # # TODO: rethink this to remove implicit ActiveRecord dependency.
+    # if defined?(RSpec)
+    #   self.fixture_path ||= RSpec.configuration.fixture_path
+    # end
 
     yield self
   end

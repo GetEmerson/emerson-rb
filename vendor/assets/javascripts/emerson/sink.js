@@ -121,7 +121,8 @@
 
         $(this).trigger('sink:before');
         strategies[strategy].call(clone, $(this))
-          .trigger('sink:after');
+        .each(forceCalculateStyle)
+        .trigger('sink:after');
 
         clone.trigger('sink:after');
       });
@@ -131,8 +132,15 @@
       strategy = parts[1] || 'replace';
 
       matches.trigger('sink:before');
-      strategies[strategy].call(prepare(element), matches)
+      element = prepare(element);
+      strategies[strategy].call(element, matches)
+        .each(forceCalculateStyle)
         .trigger('sink:after');
     }
   }
+
+  function forceCalculateStyle(elements) {
+    window.getComputedStyle(this).opacity;
+  }
+
 })(Emerson);

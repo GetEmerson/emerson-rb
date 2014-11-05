@@ -1,4 +1,4 @@
-# Emerson
+# [Emerson](http://en.wikipedia.org/wiki/Ralph_Waldo_Emerson)
 
 transcendent views. (WIP)
 

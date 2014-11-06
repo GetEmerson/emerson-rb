@@ -116,11 +116,6 @@ Generally (in current-day practice), we are working within the notion of "View" 
 
 Emerson has attempts to push/force nothing; only to encourage a "pull-model".  When people ask, "how would I write this in `emerson-js`?", my answer is always, "how would you write it in jQuery?".
 
-### Footnotes
-
-[^1]: What code to write, where to put it, what to name it.
-[^2]: We observe that domain-based modeling is generally done well for the server-side components of a web application, but the patterns and conventions are not promoted through the presentation tier and client-side.
-
 ---
 
 ## Code examples (VERY WIP):
@@ -243,7 +238,8 @@ Emerson has attempts to push/force nothing; only to encourage a "pull-model".  W
         }
 
         # Behavior: An example jQuery implementation
-        # ------------------------------------------------------------ (function($) {
+        # ------------------------------------------------------------
+        (function($) {
           // A basic jQuery extension to add “in-place editing”.
           $.fn.extend(‘inplaceEdit’, function() {
             this.each(function() {
@@ -280,12 +276,32 @@ Emerson has attempts to push/force nothing; only to encourage a "pull-model".  W
         })(jQuery);
 
         # Behavior: A naïve Emerson implementation
-        # ------------------------------------------------------------ (function($, define) {
-          // TODO
+        # ------------------------------------------------------------
+        (function($, define) {
+          var view = define('recipes/show', {
+            initialize : function() {
+              this.showIcon(); // ???
+            },
+
+            subscribe : {
+              '[data-outlet^=”inplace”]' : {
+                ‘mouseenter’ : function() {
+                  // $(e.target, this).trigger(‘inplace:hover’);
+                  this.outlet('inplace')
+                    .trigger(‘inplace:hover’);
+                }
+              },
+
+              ‘inplace:hover’ : function() {
+                $(e.target).highlight();
+              }
+            }
+          });
         })(Emerson.base, Emerson.view);
 
         # Behavior: Another Emerson implementation
-        # ------------------------------------------------------------ (function($, define) {
+        # ------------------------------------------------------------
+        (function($, define) {
           // TODO
         })(Emerson.base, Emerson.view);
 
@@ -299,8 +315,18 @@ Emerson has attempts to push/force nothing; only to encourage a "pull-model".  W
 
 ## Contributors
 
-* [Corey Innis](http://github.com/coreyti), creator, author, spiritual guide
-* [Rachel Heaton](https://github.com/rheaton), every patient user and supporter
-* [Pivotal Labs](http://pivotallabs.com/), much inspiration, support, patience
-* ...more (TODO)
+* [Corey Innis](http://github.com/coreyti) -- creator, author, spiritual guide, madman.
+* [Rachel Heaton](https://github.com/rheaton) -- ever-patient user, supporter, evangelist, co-author and co-presenter, spirtually-benevolent hard-ass.
+* [George Brocklehurst](https://github.com/georgebrock) -- editorial reviewer.
+* [Pivotal Labs crew](http://pivotallabs.com/) -- Inspiration, support, patience. Also for bringing [ElementalJS](http://pivotallabs.com/introducing-elementaljs/) into the game.
+* [JB Steadman](https://twitter.com/jbsteadman) -- Loving supporter and foundational inspiration for the HTML-thru-JSON component/option ... Amazing guy. If you haven't yet met, change that.
+* [Scott Walker](https://github.com/swalke16) -- User, feedback provider; responsible for the dialog above.
+* [James Martinez](#) -- support/excitement
+* ...many more -- **TODO**
+
+*most importantly...*
+
 * You...?
+
+[^1]: What code to write, where to put it, what to name it.
+[^2]: We observe that domain-based modeling is generally done well for the server-side components of a web application, but the patterns and conventions are not promoted through the presentation tier and client-side.
